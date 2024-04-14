@@ -21,7 +21,6 @@ public class BinlogEvent {
         this.beforeData = beforeData;
     }
 
-    // Getters and Setters
     public EventType getEventType() {
         return eventType;
     }
@@ -30,9 +29,7 @@ public class BinlogEvent {
         this.eventType = eventType;
     }
 
-    public String getTableName() {
-        return tableName;
-    }
+    public String getTableName() { return tableName; }
 
     public void setTableName(String tableName) {
         this.tableName = tableName;

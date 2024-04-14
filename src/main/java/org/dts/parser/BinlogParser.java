@@ -4,10 +4,8 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.internal.MongoClientImpl;
 import org.bson.Document;
 import org.dts.model.BinlogEvent;
-import org.dts.model.EventType;
 
 public class BinlogParser {
 
@@ -16,7 +14,6 @@ public class BinlogParser {
     private MongoCollection<Document> collection;
 
     public BinlogParser(String mongoDbHost, String dbName, String collectionName) {
-        // Initialize MongoDB client and select the database and collection
         this.mongoClient = MongoClients.create(mongoDbHost);
         this.database = mongoClient.getDatabase(dbName);
         this.collection = database.getCollection(collectionName);
@@ -24,8 +21,6 @@ public class BinlogParser {
 
     public void processEvent(BinlogEvent event) {
         switch (event.getEventType()) {
-            case QUERY:
-                handleQuery(event);
             case INSERT:
                 handleInsert(event);
                 break;
@@ -39,10 +34,6 @@ public class BinlogParser {
                 System.out.println("Unsupported event type.");
                 break;
         }
-    }
-
-    private void handleQuery(BinlogEvent event) {
-
     }
 
     private void handleInsert(BinlogEvent event) {
