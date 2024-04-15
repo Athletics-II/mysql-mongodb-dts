@@ -7,11 +7,14 @@ import org.dts.rabbitmq.EventConsumer;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 
 public class Main {
     public static void main(String[] args) throws IOException, TimeoutException {
-
+        int numThreads = 5;  // Example: 5 threads
+        ExecutorService executor = Executors.newFixedThreadPool(numThreads);
         BinlogParser parser = new BinlogParser("localhost", "testDb", "testCollection");
         BinlogEvent insertEvent = new BinlogEvent(EventType.INSERT, "test", "1", Map.of("name", "John Doe", "age", 30), null);
         BinlogEvent updateEvent = new BinlogEvent(EventType.UPDATE, "test", "1", Map.of("name", "John Doe", "age", 25), Map.of("name", "John Doe", "age", 30));
@@ -22,7 +25,17 @@ public class Main {
         parser.processEvent(updateEvent);
         parser.processEvent(queryEvent);
         parser.processEvent(deleteEvent);
-        EventConsumer consumer = new EventConsumer();
-        consumer.startConsumer();
+        for (int i = 0; i < numThreads; i++) {
+            executor.submit(() -> {
+                try {
+                    EventConsumer consumer = new EventConsumer();
+                    consumer.startConsumer();
+                } catch (Exception e) {
+                    System.err.println("Exception in consumer thread: " + e.getMessage());
+                }
+            });
+        }
+
+        executor.shutdown();
     }
 }
